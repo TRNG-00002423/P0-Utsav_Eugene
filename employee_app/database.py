@@ -7,8 +7,6 @@ def get_connection():
     return sqlite3.connect(DB_NAME)
 
 
-# here, this setup database function is used for us to validate if table exists with users, expenses, approvals.
-
 def setup_database():
     conn = get_connection()
     cursor = conn.cursor()
@@ -27,6 +25,7 @@ def setup_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             amount REAL NOT NULL,
+            category TEXT NOT NULL,
             description TEXT NOT NULL,
             date TEXT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id)
@@ -46,7 +45,6 @@ def setup_database():
         )
     """)
 
-    # sample users
     cursor.execute("""
         INSERT OR IGNORE INTO users (username, password, role)
         VALUES ('employee1', 'pass123', 'employee')

@@ -35,15 +35,16 @@ def login(username, password):
 
 def submit_expense(user_id):
     amount = get_valid_amount()
+    category = input("Enter category: ")
     description = input("Enter description: ")
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO expenses (user_id, amount, description, date)
-        VALUES (?, ?, ?, ?)
-    """, (user_id, amount, description, str(date.today())))
+        INSERT INTO expenses (user_id, amount, category, description, date)
+        VALUES (?, ?, ?, ?, ?)
+    """, (user_id, amount, category, description, str(date.today())))
 
     expense_id = cursor.lastrowid
 
@@ -63,7 +64,7 @@ def view_my_expenses(user_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT e.id, e.amount, e.description, e.date, a.status, a.comment
+        SELECT e.id, e.amount, e.category, e.description, e.date, a.status, a.comment
         FROM expenses e
         JOIN approvals a ON e.id = a.expense_id
         WHERE e.user_id = ?
@@ -80,10 +81,11 @@ def view_my_expenses(user_id):
         print("\n----------------------")
         print(f"Expense ID: {expense[0]}")
         print(f"Amount: ${expense[1]:.2f}")
-        print(f"Description: {expense[2]}")
-        print(f"Date: {expense[3]}")
-        print(f"Status: {expense[4]}")
-        print(f"Comment: {expense[5] if expense[5] else 'No comment'}")
+        print(f"Category: {expense[2]}")
+        print(f"Description: {expense[3]}")
+        print(f"Date: {expense[4]}")
+        print(f"Status: {expense[5]}")
+        print(f"Comment: {expense[6] if expense[6] else 'No comment'}")
 
 
 def edit_pending_expense(user_id):
@@ -93,7 +95,7 @@ def edit_pending_expense(user_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT e.id, e.amount, e.description, a.status
+        SELECT e.id, e.amount, e.category, e.description, a.status
         FROM expenses e
         JOIN approvals a ON e.id = a.expense_id
         WHERE e.id = ? AND e.user_id = ? AND a.status = 'pending'
@@ -108,17 +110,19 @@ def edit_pending_expense(user_id):
 
     print("\nCurrent Expense:")
     print(f"Amount: ${expense[1]:.2f}")
-    print(f"Description: {expense[2]}")
-    print(f"Status: {expense[3]}")
+    print(f"Category: {expense[2]}")
+    print(f"Description: {expense[3]}")
+    print(f"Status: {expense[4]}")
 
     new_amount = get_valid_amount()
+    new_category = input("Enter new category: ")
     new_description = input("Enter new description: ")
 
     cursor.execute("""
         UPDATE expenses
-        SET amount = ?, description = ?
+        SET amount = ?, category = ?, description = ?
         WHERE id = ? AND user_id = ?
-    """, (new_amount, new_description, expense_id, user_id))
+    """, (new_amount, new_category, new_description, expense_id, user_id))
 
     conn.commit()
     conn.close()
@@ -161,12 +165,13 @@ def delete_pending_expense(user_id):
 
     print("Expense deleted successfully.")
 
+
 def view_expense_history(user_id):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT e.id, e.amount, e.description, e.date, a.status, a.comment, a.review_date
+        SELECT e.id, e.amount, e.category, e.description, e.date, a.status, a.comment, a.review_date
         FROM expenses e
         JOIN approvals a ON e.id = a.expense_id
         WHERE e.user_id = ?
@@ -186,8 +191,9 @@ def view_expense_history(user_id):
         print("\n----------------------")
         print(f"Expense ID: {expense[0]}")
         print(f"Amount: ${expense[1]:.2f}")
-        print(f"Description: {expense[2]}")
-        print(f"Date Submitted: {expense[3]}")
-        print(f"Status: {expense[4]}")
-        print(f"Comment: {expense[5] if expense[5] else 'No comment'}")
-        print(f"Review Date: {expense[6] if expense[6] else 'Not reviewed'}")
+        print(f"Category: {expense[2]}")
+        print(f"Description: {expense[3]}")
+        print(f"Date Submitted: {expense[4]}")
+        print(f"Status: {expense[5]}")
+        print(f"Comment: {expense[6] if expense[6] else 'No comment'}")
+        print(f"Review Date: {expense[7] if expense[7] else 'Not reviewed'}")
