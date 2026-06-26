@@ -1,5 +1,5 @@
 from database import setup_database
-from expense_service import login, submit_expense, view_my_expenses, edit_pending_expense, delete_pending_expense, view_expense_history
+from expense_service import login, submit_expense, view_expense_status, edit_pending_expense, delete_pending_expense, view_expense_history, view_approval_history
 
 
 def main():
@@ -27,8 +27,11 @@ def main():
         print("2. View My Expenses")
         print("3. Edit Pending Expense")
         print("4. Delete Pending Expense")
-        print("5. View Approved/Denied History")
-        print("6. Logout")
+        print("5. View Submitted Expense Status")
+        print("6. View Full Expenses History")
+        print("7. View Approved/Denied History")
+        print("8. Logout")
+
 
         choice = input("\nChoose an option: ")
 
@@ -37,7 +40,7 @@ def main():
 
         elif choice == "2":
             view_my_expenses(user_id)
-
+        
         elif choice == "3":
             edit_pending_expense(user_id)
 
@@ -48,6 +51,12 @@ def main():
             view_expense_history(user_id)
 
         elif choice == "6":
+            view_expense_status(user_id)
+        
+        elif choice == "7":
+            view_approval_history(user_id)
+
+        elif choice == "8":
             print("Logged out.")
             break
 

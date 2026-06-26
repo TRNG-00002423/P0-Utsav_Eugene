@@ -35,7 +35,7 @@ def setup_database():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS approvals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            expense_id INTEGER NOT NULL,
+            expense_id INTEGER NOT NULL UNIQUE,
             status TEXT NOT NULL,
             reviewer INTEGER,
             comment TEXT,
