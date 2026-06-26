@@ -70,7 +70,56 @@ def view_my_expenses(user_id):
         print("Status:", expense[4])
         print("Comment:", expense[5])
 
+def view_expense_status(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
 
+    cursor.execute("""
+        SELECT e.id, a.status
+        FROM expenses e
+        JOIN approvals a ON e.id = a.expense_id
+        WHERE e.user_id = ?
+    """, (user_id,))
+
+    expenses = cursor.fetchall()
+    conn.close()
+
+    if not expenses:
+        print("No expenses found.")
+        return
+
+    for expense in expenses:
+        print("----------------------")
+        print("Expense ID:", expense[0])
+        print("Status:", expense[1])
+    
+
+def view_approval_history(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT a.id, a.expense_id, a.status, a.comment, a.review_date
+        FROM expenses e
+        JOIN approvals a ON e.id = a.expense_id
+        WHERE e.user_id = ?
+        AND a.status IN ('approved', 'denied')
+    """, (user_id,))
+
+    approvals = cursor.fetchall()
+    conn.close()
+
+    if not approvals:
+        print("No expenses found.")
+        return
+
+    for approval in approvals:
+        print("----------------------")
+        print("Approval ID:", approval[0])
+        print("Expense ID:", approval[1])
+        print("Status:", approval[2])
+        print("Status:", approval[3])
+        print("Review Date:", approval[4])
 
 def edit_expense():
 

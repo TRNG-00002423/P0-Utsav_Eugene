@@ -1,5 +1,5 @@
 from database import setup_database
-from expense_service import login, submit_expense, view_my_expenses
+from expense_service import login, submit_expense, view_approval_history, view_expense_status, view_my_expenses
 
 
 def main():
@@ -23,7 +23,9 @@ def main():
         print("\n--- Menu ---")
         print("1. Submit Expense")
         print("2. View My Expenses")
-        print("3. Logout")
+        print("3. View Submitted Expense Status")
+        print("4. View Approval History")
+        print("5. Logout")
 
         choice = input("Choose an option: ")
 
@@ -32,8 +34,14 @@ def main():
 
         elif choice == "2":
             view_my_expenses(user_id)
-
+        
         elif choice == "3":
+            view_expense_status(user_id)
+        
+        elif choice == "4":
+            view_approval_history(user_id)
+
+        elif choice == "5":
             print("Logged out.")
             break
 
