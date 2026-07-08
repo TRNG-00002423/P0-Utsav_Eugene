@@ -25,7 +25,7 @@ public class ManagerApp {
     }
 
     public static void main(String[] args) {
-
+        ManagerService managerService = new ManagerService();
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("================================");
@@ -39,7 +39,7 @@ public class ManagerApp {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        int managerId = ManagerService.login(username, password);
+        int managerId = managerService.login(username, password);
 
         if (managerId == -1) {
             System.out.println("Invalid manager login.");
@@ -66,7 +66,7 @@ public class ManagerApp {
 
             if (choice.equals("1")) {
 
-                ManagerService.viewPendingExpenses();
+                managerService.viewPendingExpenses();
 
             } else if (choice.equals("2")) {
 
@@ -75,7 +75,7 @@ public class ManagerApp {
                 System.out.print("Enter comment: ");
                 String comment = scanner.nextLine();
 
-                ManagerService.updateExpenseStatus(expenseId, managerId, "approved", comment);
+                managerService.updateExpenseStatus(expenseId, managerId, "approved", comment);
 
             } else if (choice.equals("3")) {
 
@@ -84,19 +84,19 @@ public class ManagerApp {
                 System.out.print("Enter comment: ");
                 String comment = scanner.nextLine();
 
-                ManagerService.updateExpenseStatus(expenseId, managerId, "denied", comment);
+                managerService.updateExpenseStatus(expenseId, managerId, "denied", comment);
 
             } else if (choice.equals("4")) {
 
-                ManagerService.reportByEmployee();
+                managerService.reportByEmployee();
 
             } else if (choice.equals("5")) {
 
-                ManagerService.reportByCategory();
+                managerService.reportByCategory();
 
             } else if (choice.equals("6")) {
 
-                ManagerService.reportByDate();
+                managerService.reportByDate();
 
             } else if (choice.equals("7")) {
 
