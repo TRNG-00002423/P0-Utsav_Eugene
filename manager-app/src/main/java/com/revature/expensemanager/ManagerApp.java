@@ -1,9 +1,12 @@
 package com.revature.expensemanager;
 
 import java.util.Scanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ManagerApp {
-
+    private static final Logger logger =
+        LoggerFactory.getLogger(ManagerApp.class);
     private static int getValidExpenseId(Scanner scanner) {
         while (true) {
             System.out.print("Enter expense ID: ");
@@ -12,19 +15,22 @@ public class ManagerApp {
                 int expenseId = Integer.parseInt(scanner.nextLine());
 
                 if (expenseId <= 0) {
-                    System.out.println("Expense ID must be greater than 0.");
+                    logger.warn("Invalid expense ID input received, must be greater than 0.");
+                    System.out.println("Please enter a valid number: ");
                     continue;
                 }
 
                 return expenseId;
 
             } catch (NumberFormatException e) {
+                logger.warn("Invalid expense ID input received, must be greater than 0.");
                 System.out.println("Please enter a valid number.");
             }
         }
     }
 
     public static void main(String[] args) {
+        logger.info("Manager application started.");
         ManagerService managerService = new ManagerService();
         Scanner scanner = new Scanner(System.in);
 
@@ -38,15 +44,16 @@ public class ManagerApp {
 
         System.out.print("Password: ");
         String password = scanner.nextLine();
-
+        logger.info("Manager login attempted for username: {}", username);
         int managerId = managerService.login(username, password);
 
         if (managerId == -1) {
+            logger.warn("Manager login failed for username: {}", username);
             System.out.println("Invalid manager login.");
             scanner.close();
             return;
         }
-
+        logger.debug("Successful login for: {}", username);
         System.out.println("Welcome, " + username + "!");
 
         while (true) {
@@ -63,9 +70,10 @@ public class ManagerApp {
 
             System.out.print("\nChoose an option: ");
             String choice = scanner.nextLine();
+            logger.info("Manager selected menu option: {}", choice);
 
             if (choice.equals("1")) {
-
+                logger.info("Manager {} requested pending expenses.", managerId);
                 managerService.viewPendingExpenses();
 
             } else if (choice.equals("2")) {
@@ -74,7 +82,7 @@ public class ManagerApp {
 
                 System.out.print("Enter comment: ");
                 String comment = scanner.nextLine();
-
+                logger.info("Manager {} requested to approve expense {}.", managerId, expenseId);
                 managerService.updateExpenseStatus(expenseId, managerId, "approved", comment);
 
             } else if (choice.equals("3")) {
@@ -83,19 +91,19 @@ public class ManagerApp {
 
                 System.out.print("Enter comment: ");
                 String comment = scanner.nextLine();
-
+                logger.info("Manager {} requested to deny expense {}.", managerId, expenseId);
                 managerService.updateExpenseStatus(expenseId, managerId, "denied", comment);
 
             } else if (choice.equals("4")) {
-
+                logger.info("Manager {} requested report by employee.", managerId);
                 managerService.reportByEmployee();
 
             } else if (choice.equals("5")) {
-
+                logger.info("Manager {} requested report by category.", managerId);
                 managerService.reportByCategory();
 
             } else if (choice.equals("6")) {
-
+                logger.info("Manager {} requested report by date.", managerId);
                 managerService.reportByDate();
 
             } else if (choice.equals("7")) {
@@ -104,11 +112,11 @@ public class ManagerApp {
                 break;
 
             } else {
-
+                logger.warn("Invalid menu choice entered: {}", choice);
                 System.out.println("Invalid choice. Please choose 1-7.");
             }
         }
-
+        logger.info("Manager {} logged out.", managerId);
         scanner.close();
     }
 }

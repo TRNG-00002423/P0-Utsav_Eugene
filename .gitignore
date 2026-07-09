@@ -1,0 +1,20 @@
+# Java/Maven build output
+target/
+manager-app/target/
+
+# Logs
+logs/
+manager-app/logs/
+*.log
+
+# SQLite local database files
+*.db
+*.db-journal
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code
+.vscode/
