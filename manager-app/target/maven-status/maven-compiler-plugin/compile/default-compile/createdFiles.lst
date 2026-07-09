@@ -1,0 +1,5 @@
+com\revature\expensemanager\DatabaseConnection.class
+com\revature\expensemanager\ManagerApp.class
+com\revature\expensemanager\ManagerService.class
+com\revature\expensemanager\ManagerDao.class
+com\revature\expensemanager\ManagerDaoImpl.class
