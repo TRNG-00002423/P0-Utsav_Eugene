@@ -1,5 +1,6 @@
 from datetime import date
 from database import get_connection
+import bcrypt
 
 
 def get_valid_amount():
@@ -17,20 +18,31 @@ def get_valid_amount():
             print("Please enter a valid number.")
 
 
+def check_password(password, hashed_password):
+    return bcrypt.checkpw(
+        password.encode("utf-8"),
+        hashed_password.encode("utf-8")
+    )
+
 def login(username, password):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, username, role
+        SELECT id, username, password, role
         FROM users
-        WHERE username = ? AND password = ? AND role = 'employee'
-    """, (username, password))
+        WHERE username = ? AND role = 'employee'
+    """, (username,))
 
     user = cursor.fetchone()
     conn.close()
 
-    return user
+    stored_hash = user[2]
+
+    if check_password(password, stored_hash):
+        return user
+    else: 
+        return None
 
 
 def submit_expense(user_id):
