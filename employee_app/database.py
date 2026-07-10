@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 
 DB_NAME = "expense_manager.db"
 
@@ -6,6 +7,12 @@ DB_NAME = "expense_manager.db"
 def get_connection():
     return sqlite3.connect(DB_NAME)
 
+
+def hash_password(password):
+    return bcrypt.hashpw(
+        password.encode("utf-8"),
+        bcrypt.gensalt()
+    ).decode("utf-8")
 
 def setup_database():
     conn = get_connection()
@@ -45,15 +52,18 @@ def setup_database():
         )
     """)
 
-    cursor.execute("""
-        INSERT OR IGNORE INTO users (username, password, role)
-        VALUES ('employee1', 'pass123', 'employee')
-    """)
+    employee_password = hash_password("pass123")
+    manager_password = hash_password("admin123")
 
     cursor.execute("""
         INSERT OR IGNORE INTO users (username, password, role)
-        VALUES ('manager1', 'admin123', 'manager')
-    """)
+        VALUES (?, ? ,?) """,
+                   ('employee1', employee_password, 'employee'))
+
+    cursor.execute("""
+        INSERT OR IGNORE INTO users (username, password, role)
+        VALUES (?, ?, ?) """,
+                   ('manager1', manager_password, 'manager'))
 
     conn.commit()
     conn.close()

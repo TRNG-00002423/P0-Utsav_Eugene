@@ -6,25 +6,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class ManagerDaoImpl implements ManagerDao{
     private static final Logger logger =
         LoggerFactory.getLogger(ManagerDaoImpl.class);
     @Override
     public int login(String username, String password) {
-        String sql = "SELECT id FROM users WHERE username = ? AND password = ? AND role = 'manager'";
+        String sql = "SELECT id, password FROM users WHERE username = ? AND role = 'manager'";
         logger.debug("Executing manager login query for username: {}", username);
         try (
                 Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);
-            stmt.setString(2, password);
 
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt("id");
+                int managerId = rs.getInt("id");
+                String storedPswd = rs.getString("password");
+
+                BCrypt.Result result = BCrypt.verifyer()
+                        .verify(password.toCharArray(), storedPswd);
+
+                if (result.verified) {
+                    logger.info("Manager password is validated for: {}", username);
+                    return managerId;
+                }
+                
             }
 
             return -1;
