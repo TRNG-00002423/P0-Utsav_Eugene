@@ -71,15 +71,16 @@ def submit_expense(user_id):
     print("Expense submitted successfully.")
 
 
-def view_expense_status(user_id):
+def view_my_expense(user_id):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT e.id, a.status
+        SELECT e.id, e.amount, e.category, e.description, e.date, a.status
         FROM expenses e
         JOIN approvals a ON e.id = a.expense_id
         WHERE e.user_id = ?
+        ORDER BY e.id DESC
     """, (user_id,))
 
     expenses = cursor.fetchall()
@@ -89,11 +90,46 @@ def view_expense_status(user_id):
         print("No expenses found.")
         return
 
+    print("\n=== My Expenses ===")
+
+    for expense in expenses:
+        print("\n----------------------")
+        print(f"Expense ID: {expense[0]}")
+        print(f"Amount: ${expense[1]:.2f}")
+        print(f"Category: {expense[2]}")
+        print(f"Description: {expense[3]}")
+        print(f"Date Submitted: {expense[4]}")
+        print(f"Status: {expense[5]}")
+
+
+def view_expense_status(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT e.id, e.amount, e.category, a.status
+        FROM expenses e
+        JOIN approvals a ON e.id = a.expense_id
+        WHERE e.user_id = ?
+        ORDER BY e.id DESC
+    """, (user_id,))
+
+    expenses = cursor.fetchall()
+    conn.close()
+
+    if not expenses:
+        print("No expenses found.")
+        return
+
+    print("\n=== Expense Status ===")
+
     for expense in expenses:
         print("----------------------")
         print("Expense ID:", expense[0])
-        print("Status:", expense[1])
-    
+        print(f"Amount: ${expense[1]:.2f}")
+        print("Category:", expense[2])
+        print("Status:", expense[3])
+
 
 def view_approval_history(user_id):
     conn = get_connection()
@@ -105,22 +141,26 @@ def view_approval_history(user_id):
         JOIN approvals a ON e.id = a.expense_id
         WHERE e.user_id = ?
         AND a.status IN ('approved', 'denied')
+        ORDER BY a.id DESC
     """, (user_id,))
 
     approvals = cursor.fetchall()
     conn.close()
 
     if not approvals:
-        print("No expenses found.")
+        print("No approved or denied expenses found.")
         return
+
+    print("\n=== Approval History ===")
 
     for approval in approvals:
         print("----------------------")
         print("Approval ID:", approval[0])
         print("Expense ID:", approval[1])
         print("Status:", approval[2])
-        print("Comments:", approval[3])
-        print("Review Date:", approval[4])
+        print("Comment:", approval[3] if approval[3] else "No comment")
+        print("Review Date:", approval[4] if approval[4] else "Not reviewed")
+
 
 def edit_pending_expense(user_id):
     expense_id = input("Enter expense ID to edit: ")
@@ -210,6 +250,7 @@ def view_expense_history(user_id):
         JOIN approvals a ON e.id = a.expense_id
         WHERE e.user_id = ?
         AND a.status IN ('approved', 'denied')
+        ORDER BY e.id DESC
     """, (user_id,))
 
     expenses = cursor.fetchall()
@@ -219,7 +260,7 @@ def view_expense_history(user_id):
         print("No approved or denied expenses found.")
         return
 
-    print("\n=== Expense History ===")
+    print("\n=== Full Expense History ===")
 
     for expense in expenses:
         print("\n----------------------")
